@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const HF_API_KEY = process.env.HF_API_KEY;
 const HF_MODEL_URL = 'https://api-inference.huggingface.co/models/google/gemma-2-9b-it';
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://cvwithaichat-app.vercel.app/'; // 새로운 도메인으로 변경
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://cvwithaichat-app.vercel.app'; // 새로운 도메인으로 변경
 
 if (!HF_API_KEY) {
   console.error('HF_API_KEY is not set in .env file');

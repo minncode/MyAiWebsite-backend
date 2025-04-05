@@ -1,17 +1,48 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const app = express();
-const port = 5000;
+
+// Render에서 제공하는 포트를 사용
+const port = process.env.PORT;
 
 require('dotenv').config();
+
+// 환경 변수 확인
 const HF_API_KEY = process.env.HF_API_KEY;
 const HF_MODEL_URL = 'https://api-inference.huggingface.co/models/google/gemma-2-9b-it';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://cvwithaichat-bxh82d1dm-kim-minsungs-projects.vercel.app';
+
+if (!HF_API_KEY) {
+  console.error('HF_API_KEY is not set in .env file');
+  process.exit(1);
+}
+
+if (!CORS_ORIGIN) {
+  console.warn('CORS_ORIGIN is not set, using default:', CORS_ORIGIN);
+}
+
+// CORS 설정
 app.use(cors({
-    origin: 'https://cvwithaichat-bxh82d1dm-kim-minsungs-projects.vercel.app', // 배포된 프론트엔드 URL
-    methods: ['GET', 'POST'],
-  }));
+  origin: CORS_ORIGIN,
+  methods: ['GET', 'POST'],
+}));
+
+// 요청 속도 제한
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15분
+  max: 100, // 최대 100 요청
+  message: { error: 'Too many requests, please try again later' },
+});
+app.use('/ask', limiter);
+
 app.use(express.json());
+
+// 헬스 체크 엔드포인트 (선택 사항)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
 
 app.post('/ask', async (req, res) => {
   const userInput = req.body.message;
@@ -49,11 +80,24 @@ app.post('/ask', async (req, res) => {
       res.status(500).json({ error: 'Invalid response from Hugging Face API' });
     }
   } catch (error) {
-    console.error('Hugging Face API error:', error.response?.data || error.message);
-    res.status(500).json({ error: 'Error communicating with Hugging Face API', details: error.message });
+    console.error('Hugging Face API error:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    res.status(500).json({
+      error: 'Error communicating with Hugging Face API',
+      details: error.response?.data?.error || error.message,
+    });
   }
 });
 
+// 포트가 정의되지 않았을 경우 에러 처리
+if (!port) {
+  console.error('PORT is not defined by Render');
+  process.exit(1);
+}
+
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });

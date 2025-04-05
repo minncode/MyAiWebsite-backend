@@ -3,16 +3,13 @@ const axios = require('axios');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const app = express();
-
-// Render에서 제공하는 포트를 사용
 const port = process.env.PORT;
 
 require('dotenv').config();
 
-// 환경 변수 확인
 const HF_API_KEY = process.env.HF_API_KEY;
 const HF_MODEL_URL = 'https://api-inference.huggingface.co/models/google/gemma-2-9b-it';
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://cvwithaichat-bxh82d1dm-kim-minsungs-projects.vercel.app';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://cvwithaichat-oyuuke6nq-kim-minsungs-projects.vercel.app'; // 새로운 도메인으로 변경
 
 if (!HF_API_KEY) {
   console.error('HF_API_KEY is not set in .env file');
@@ -23,23 +20,20 @@ if (!CORS_ORIGIN) {
   console.warn('CORS_ORIGIN is not set, using default:', CORS_ORIGIN);
 }
 
-// CORS 설정
 app.use(cors({
   origin: CORS_ORIGIN,
   methods: ['GET', 'POST'],
 }));
 
-// 요청 속도 제한
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15분
-  max: 100, // 최대 100 요청
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: { error: 'Too many requests, please try again later' },
 });
 app.use('/ask', limiter);
 
 app.use(express.json());
 
-// 헬스 체크 엔드포인트 (선택 사항)
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy' });
 });
@@ -92,7 +86,6 @@ app.post('/ask', async (req, res) => {
   }
 });
 
-// 포트가 정의되지 않았을 경우 에러 처리
 if (!port) {
   console.error('PORT is not defined by Render');
   process.exit(1);

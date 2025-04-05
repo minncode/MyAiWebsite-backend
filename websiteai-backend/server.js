@@ -9,7 +9,6 @@ require('dotenv').config();
 
 const HF_API_KEY = process.env.HF_API_KEY;
 const HF_MODEL_URL = 'https://api-inference.huggingface.co/models/google/gemma-2-9b-it';
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://cvwithaichat-oyuuke6nq-kim-minsungs-projects.vercel.app'; // 새로운 도메인으로 변경
 
 if (!HF_API_KEY) {
   console.error('HF_API_KEY is not set in .env file');
@@ -21,8 +20,9 @@ if (!CORS_ORIGIN) {
 }
 
 app.use(cors({
-  origin: CORS_ORIGIN,
+  origin: ['https://cvwithaichat-app.vercel.app'], // 여기에 너의 실제 프론트 주소 넣기
   methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 const limiter = rateLimit({

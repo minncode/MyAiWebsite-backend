@@ -9,19 +9,29 @@ require('dotenv').config();
 
 const HF_API_KEY = process.env.HF_API_KEY;
 const HF_MODEL_URL = 'https://api-inference.huggingface.co/models/google/gemma-2-9b-it';
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://cvwithaichat-app.vercel.app'; // 새로운 도메인으로 변경
+
+// 허용할 도메인 목록
+const allowedOrigins = [
+  'https://cvwithaichat-app.vercel.app',
+  'https://cvwithaichat-2wi0hk4do-kim-minsungs-projects.vercel.app',
+  'http://localhost:3000', // 로컬 테스트용
+];
 
 if (!HF_API_KEY) {
   console.error('HF_API_KEY is not set in .env file');
   process.exit(1);
 }
 
-if (!CORS_ORIGIN) {
-  console.warn('CORS_ORIGIN is not set, using default:', CORS_ORIGIN);
-}
-
+// 동적 CORS 설정
 app.use(cors({
-  origin: CORS_ORIGIN, // 여기에 너의 실제 프론트 주소 넣기
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin);
+    } else {
+      console.warn(`CORS policy blocked request from origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));

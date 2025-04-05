@@ -7,7 +7,10 @@ const port = 5000;
 require('dotenv').config();
 const HF_API_KEY = process.env.HF_API_KEY;
 const HF_MODEL_URL = 'https://api-inference.huggingface.co/models/google/gemma-2-9b-it';
-app.use(cors());
+app.use(cors({
+    origin: 'https://cvwithaichat-bxh82d1dm-kim-minsungs-projects.vercel.app', // 배포된 프론트엔드 URL
+    methods: ['GET', 'POST'],
+  }));
 app.use(express.json());
 
 app.post('/ask', async (req, res) => {

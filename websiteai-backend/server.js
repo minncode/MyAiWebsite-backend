@@ -57,12 +57,18 @@ app.post('/ask', async (req, res) => {
   }
 
   const prompt = `
-    Respond to users' questions in a clean, structured format.
-    - Your answers should be concise and clear.
-    - If you use lists, separate each item with a line break and number it.
-    - Avoid unnecessary repetition and provide specific advice that reflects the user's context.
-    ${userInput}
-  `;
+You are a helpful AI assistant. Answer the user's question below clearly and concisely.
+
+Guidelines:
+1. Keep responses brief and to the point.
+2. Use numbered lists with line breaks for multiple points.
+3. Avoid repetition.
+4. Make responses context-aware and practical.
+
+User: ${userInput}
+Assistant:
+`;
+
 
   try {
     const response = await axios.post(

@@ -10,10 +10,12 @@ require('dotenv').config();
 const HF_API_KEY = process.env.HF_API_KEY;
 const HF_MODEL_URL = 'https://api-inference.huggingface.co/models/google/gemma-2-9b-it';
 
-// 환경 변수에서 허용 도메인 가져오기 (쉼표로 구분된 문자열)
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:3000'];
+// 허용할 도메인 목록
+const allowedOrigins = [
+  'https://cvwithaichat-app.vercel.app',
+  'https://cvwithaichat-6ml9jo5on-kim-minsungs-projects.vercel.app',
+  'http://localhost:3000', // 로컬 테스트용
+];
 
 if (!HF_API_KEY) {
   console.error('HF_API_KEY is not set in .env file');
